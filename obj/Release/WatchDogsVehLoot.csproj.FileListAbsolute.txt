@@ -1,0 +1,14 @@
+M:\Experimental Apps\WD2CarLoot\bin\Release\WatchDogsVehLoot.dll
+M:\Experimental Apps\WD2CarLoot\bin\Release\WatchDogsVehLoot.pdb
+M:\Experimental Apps\WD2CarLoot\bin\Release\Newtonsoft.Json.dll
+M:\Experimental Apps\WD2CarLoot\bin\Release\ScriptHookVDotNet2.dll
+M:\Experimental Apps\WD2CarLoot\bin\Release\Newtonsoft.Json.pdb
+M:\Experimental Apps\WD2CarLoot\bin\Release\Newtonsoft.Json.xml
+M:\Experimental Apps\WD2CarLoot\bin\Release\ScriptHookVDotNet2.xml
+M:\Experimental Apps\WD2CarLoot\obj\Release\WatchDogsVehLoot.Properties.Items.resources
+M:\Experimental Apps\WD2CarLoot\obj\Release\WatchDogsVehLoot.csproj.GenerateResource.cache
+M:\Experimental Apps\WD2CarLoot\obj\Release\WatchDogsVehLoot.csproj.CoreCompileInputs.cache
+M:\Experimental Apps\WD2CarLoot\obj\Release\WatchDogsVehLoot.csproj.CopyComplete
+M:\Experimental Apps\WD2CarLoot\obj\Release\WatchDogsVehLoot.dll
+M:\Experimental Apps\WD2CarLoot\obj\Release\WatchDogsVehLoot.pdb
+M:\Experimental Apps\WD2CarLoot\obj\Release\WatchDogsVehLoot.csprojAssemblyReference.cache

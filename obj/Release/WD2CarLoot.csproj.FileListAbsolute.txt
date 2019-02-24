@@ -1,0 +1,10 @@
+M:\Experimental Apps\WD2CarLoot\bin\Release\WD2CarLoot.dll
+M:\Experimental Apps\WD2CarLoot\bin\Release\WD2CarLoot.pdb
+M:\Experimental Apps\WD2CarLoot\bin\Release\ScriptHookVDotNet2.dll
+M:\Experimental Apps\WD2CarLoot\bin\Release\ScriptHookVDotNet2.xml
+M:\Experimental Apps\WD2CarLoot\obj\Release\WD2CarLoot.Properties.Items.resources
+M:\Experimental Apps\WD2CarLoot\obj\Release\WD2CarLoot.csproj.GenerateResource.cache
+M:\Experimental Apps\WD2CarLoot\obj\Release\WD2CarLoot.csproj.CoreCompileInputs.cache
+M:\Experimental Apps\WD2CarLoot\obj\Release\WD2CarLoot.csproj.CopyComplete
+M:\Experimental Apps\WD2CarLoot\obj\Release\WD2CarLoot.dll
+M:\Experimental Apps\WD2CarLoot\obj\Release\WD2CarLoot.pdb
