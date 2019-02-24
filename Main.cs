@@ -7,6 +7,7 @@ using WatchDogsVehLoot;
 using System.Linq;
 using System.Windows.Forms;
 using GTA.Math;
+using System.Drawing;
 
 namespace WDVH
 {
@@ -28,28 +29,59 @@ namespace WDVH
 
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
-            foreach (Vector3 markerPos in pawnLocations) // Iterate through all pawn shop locations
+            if (e.KeyCode == Keys.E) // if the player is also pressing E
             {
-                if (World.GetDistance(Game.Player.Character.Position, markerPos) <= 2.5f && modConfig.inventory.totalValue > 0 && modConfig.inventory.items.Count >= 1) // If the player is near the pawn shop location and they have items to sell
+                foreach (Vector3 markerPos in pawnLocations) // Iterate through all pawn shop locations
                 {
-                    if(e.KeyCode == Keys.E) // if the player is also pressing E
+                    if (World.GetDistance(Game.Player.Character.Position, markerPos) <= 1.25f && modConfig.inventory.totalValue > 0 && modConfig.inventory.items.Count >= 1) // If the player is near the pawn shop location and they have items to sell
                     {
+                        Game.FadeScreenOut(1000); // Fade the screen out
+                        Game.Player.Character.FreezePosition = true; // Freeze the player to prevent them from walking as the screen is faded
+                        Wait(1000); // Wait 500ms
                         int itemCount = modConfig.inventory.items.Count; // Create a value for the amount of items sold
                         int itemValue = modConfig.inventory.totalValue; // Create a value for the total value of the items
                         modConfig.inventory.items.Clear(); // Clear the inventory
                         modConfig.inventory.totalValue = 0; // Set the total value to 0
-                        Game.Player.Money = Game.Player.Money + itemValue; // Add the money from the items
-                        UI.Notify($"You just sold {itemCount} items for ${itemValue}!"); // Notify the player about their transaction
                         Save(); // Save the mod config
+                        World.CurrentDayTime = new TimeSpan(World.CurrentDayTime.Hours + new Random().Next(1, itemCount), new Random().Next(1,59), new Random().Next(1, 59)); // Increase the time of the day
+                        Wait(500); // Wait 500ms
+                        Game.Player.Character.FreezePosition = false; // Unfreeze the player
+                        Game.FadeScreenIn(1000); // Fade the screen in
+                        Game.Player.Money = Game.Player.Money + itemValue; // Add the money from the items
+                        if (itemCount > 1) UI.Notify($"You just sold {itemCount} items for ${itemValue}!"); // If the player is selling more than one item display that they sold {x} itemS
+                        else if (itemCount == 1) UI.Notify($"You just sold {itemCount} item for ${itemValue}!");// If the player is selling one item display that they sold {x} item
                     }
                 }
             }
 
-            if(e.KeyCode == Keys.L && e.Shift)
+            if (e.KeyCode == modConfig.settings.addPawnKey) // If the player pressed the key to add a pawn shop
             {
-                string pawnShopName = Game.GetUserInput("Pawn Shop Name", 25); // Get the name of the pawn shop
-                CreatePawnShop(Game.Player.Character.Position, pawnShopName); // Create the pawn shop
-                UI.Notify("Successfully created pawn shop!"); // Notify the user that the pawn shop was created
+                if(modConfig.settings.doesAddPawnRequireShift) // If adding pawn shops requires shift
+                {
+                    if (e.Shift) // If shift is pressed
+                    {
+                        GetInputForNewPawnShop(); // Call the method used to get the information on the new shop and create it
+                    }
+                }
+                else // If it doesn't require shift
+                {
+                    GetInputForNewPawnShop(); // Call the method used to get the information on the new shop and create it
+                }
+            }
+
+            if(e.KeyCode == modConfig.settings.addItemKey) // If the player pressed the ky to add an item
+            {
+                if (modConfig.settings.doesAddItemRequireShift) // If adding items requires shift
+                {
+                    if (e.Shift)
+                    {
+                        GetInputForNewPawnItem(); // Call the method used to get the information on the new item and create it
+                    }
+                }
+                else // If it doesn't require shift
+                {
+                    GetInputForNewPawnItem(); // Call the method used to get the information on the new item and create it
+                }
             }
         }
 
@@ -64,6 +96,14 @@ namespace WDVH
 
         private void OnTick(object sender, EventArgs e) // Runs every frame
         {
+            if(modConfig.settings.doPawnShopsHave3dMarkers)
+            {
+                foreach(Vector3 pawnShop in pawnLocations)
+                {
+                    if(World.GetDistance(Game.Player.Character.Position, pawnShop) <= 150) World.DrawMarker(MarkerType.VerticalCylinder, new Vector3(pawnShop.X, pawnShop.Y, pawnShop.Z - pawnShop.Z / pawnShop.Z), Vector3.Zero, Vector3.Zero, new Vector3(1.5f, 1.5f, 0.5f), Color.Yellow); // If the player is 150 or less units from the shop location then show the marker
+                }
+            }
+
             if (Game.Player.Character.CurrentVehicle != null) // If the player is in a vehicle
             {
                 if (!lootedVehicles.Contains(Game.Player.Character.CurrentVehicle)) // Check if the current vehicle is not already looted
@@ -75,7 +115,7 @@ namespace WDVH
             {
                 foreach(Vector3 markerPos in pawnLocations) // Iterate over all pawn shop locations
                 {
-                    if (World.GetDistance(Game.Player.Character.Position, markerPos) <= 2.5f && modConfig.inventory.totalValue > 0 && modConfig.inventory.items.Count >= 1) // If the player is near the pawn shop location and they have items to sell
+                    if (World.GetDistance(Game.Player.Character.Position, markerPos) <= 1.25f && modConfig.inventory.totalValue > 0 && modConfig.inventory.items.Count >= 1) // If the player is near the pawn shop location and they have items to sell
                     {
                         UI.ShowSubtitle($"Press ~y~E ~w~to sell your loot to the pawn shop (${modConfig.inventory.totalValue})", 1); // Tell them they can sell their loot
                     }
@@ -109,7 +149,7 @@ Visit a ~g~Pawn Shop ~w~to sell your loot"; // Set the item to be the item retri
             }
             else // If the player does get money
             {
-                int moneyToGain = r.Next(modConfig.money.FirstOrDefault(x => x.Key == "minMoney").Value, modConfig.money.FirstOrDefault(x => x.Key == "maxMoney").Value); // Determine a random amount of money based on the config minimum and maximum
+                int moneyToGain = r.Next(modConfig.settings.money.FirstOrDefault(x => x.Key == "minMoney").Value, modConfig.settings.money.FirstOrDefault(x => x.Key == "maxMoney").Value); // Determine a random amount of money based on the config minimum and maximum
                 item = $"${moneyToGain}"; // Set the text to say $[moneyEarned]
                 Game.Player.Money = Game.Player.Money + moneyToGain; // Add the money to the players wallet
             }
@@ -137,6 +177,7 @@ Visit a ~g~Pawn Shop ~w~to sell your loot"; // Set the item to be the item retri
             if (!File.Exists("scripts\\WatchDogsVehLoot.json"))
             {
                 modConfig = new Configuration(); // Create the modconfig
+                modConfig.settings = new Settings();
                 modConfig.lootItems = new List<LootItem>(); // Create a list of loot
                 modConfig.pawnShops = new List<PawnShop>(); // Create a list of pawn shops
                 modConfig.inventory = new Inventory()
@@ -176,33 +217,75 @@ Visit a ~g~Pawn Shop ~w~to sell your loot"; // Set the item to be the item retri
                     value = 750
                 });
 
-                modConfig.money = new Dictionary<string, int> // Set the min and max money possible to get
+                modConfig.lootItems.Add(new LootItem()
+                {
+                    displayName = "Krolex Watch",
+                    value = 125
+                });
+
+                modConfig.lootItems.Add(new LootItem()
+                {
+                    displayName = "Diamond Earrings",
+                    value = 100
+                });
+
+                modConfig.lootItems.Add(new LootItem()
+                {
+                    displayName = "Electronic Components",
+                    value = 25
+                });
+
+                modConfig.settings.money = new Dictionary<string, int> // Set the min and max money possible to get
                 {
                     { "minMoney", 25 },
                     { "maxMoney", 5000 }
                 };
 
-                try
+                // Define the default keys for adding items and pawn shops
+                modConfig.settings.addItemKey = Keys.K;
+                modConfig.settings.addPawnKey = Keys.L;
+                // Make both adding pawn shops and items require shift
+                modConfig.settings.doesAddItemRequireShift = true;
+                modConfig.settings.doesAddPawnRequireShift = true;
+
+                modConfig.settings.doPawnShopsHave3dMarkers = false; // Make pawn shops not have a 3d marker at their location
+
+                // Add the pawn shops to the pawn list
+                modConfig.pawnShops.Add(new PawnShop
                 {
-                    // Add the pawn shops to the pawn list
-                    modConfig.pawnShops.Add(new PawnShop
-                    {
-                        friendlyName = "Boulevard Del Perro Pawn & Jewelry",
-                        markerX = -1459.451f,
-                        markerY = -414.505f,
-                        markerZ = 35.714f
-                    });
+                    friendlyName = "Boulevard Del Perro Pawn & Jewelry",
+                    markerX = -1459.451f,
+                    markerY = -414.505f,
+                    markerZ = 35.714f
+                });
 
-
-
-                    string json = JsonConvert.SerializeObject(modConfig, Formatting.Indented); // Serialize the loot dictionary to json
-                    File.WriteAllText("scripts\\WatchDogsVehLoot.json", json); // Write a new json file with the dictionary in it
-                    VerifyAndLoadJson();
-                }
-                catch(Exception e)
+                modConfig.pawnShops.Add(new PawnShop
                 {
-                    UI.Notify(e.Message);
-                }
+                    friendlyName = "Strawberry Ave Pawn & Jewelry",
+                    markerX = 183.448f,
+                    markerY = -1319.98f,
+                    markerZ = 29.322f
+                });
+
+                modConfig.pawnShops.Add(new PawnShop
+                {
+                    friendlyName = "Carson Ave Discount Jewels",
+                    markerX = 133.185f,
+                    markerY = -1769.581f,
+                    markerZ = 29.409f
+                });
+
+                modConfig.pawnShops.Add(new PawnShop
+                {
+                    friendlyName = "F.T. Pawn",
+                    markerX = 412.780243f,
+                    markerY = 313.337982f,
+                    markerZ = 103.020088f
+                });
+
+                string json = JsonConvert.SerializeObject(modConfig, Formatting.Indented); // Serialize the loot dictionary to json
+                File.WriteAllText("scripts\\WatchDogsVehLoot.json", json); // Write a new json file with the dictionary in it
+                VerifyAndLoadJson();
             }
             else
             {
@@ -220,15 +303,51 @@ Visit a ~g~Pawn Shop ~w~to sell your loot"; // Set the item to be the item retri
                     pawnBlips.Add(shopBlip); // Add the blip to the list of pawn blips
                     pawnLocations.Add(markerPositions); // Add the location to the locations list
                 }
-                UI.Notify($"Loaded ~y~{modConfig.lootItems.Count} ~w~loot item(s) & ~y~{modConfig.pawnShops.Count} ~w~Pawn Shop(s)!"); // Notify the user that the config loaded
+                // Create two strings for non plural words
+                string itemOrItemS = "item";
+                string shopOrShopS = "Shop";
+
+                // Change the non plural strings to be plural if there's more than one item or shop
+                if (modConfig.lootItems.Count > 1) itemOrItemS = "items";
+                if (modConfig.pawnShops.Count > 1) shopOrShopS = "Shops";
+
+                UI.Notify($"Loaded ~y~{modConfig.lootItems.Count} ~w~loot {itemOrItemS} & ~y~{modConfig.pawnShops.Count} ~w~Pawn {shopOrShopS}!"); // Notify the user that the config loaded
             }
         }
-
 
         private void Save()
         {
             string json = JsonConvert.SerializeObject(modConfig, Formatting.Indented); // Serialize the config
             if(json != null && json != "") File.WriteAllText("scripts\\WatchDogsVehLoot.json", json); // Write the config if the json is not blank
+        }
+
+        private void GetInputForNewPawnItem()
+        {
+            string itemName = Game.GetUserInput("Item Name", 25); // Get the item name and store it in a string
+            int itemValue; // Define the item value integer
+        returnpoint:
+            try
+            {
+                Int32.TryParse(Game.GetUserInput("Value", 7), out itemValue); // Try to convert the item value to an int and store it in itemValue
+            }
+            catch // if the game could not parse the string
+            {
+                UI.Notify("Invalid Input. Please try again"); // Notify the user of their fault
+                Wait(500); // Give the player a tiny bit of time before re opening the GetUserInput window
+                goto returnpoint; // Return to returnpoint to get input again
+            }
+            if (itemValue != 0 && itemName != "" && itemName != null)
+            {
+                CreatePawnItem(itemName, itemValue);
+                UI.Notify("Successfully added item!");
+            }
+        }
+
+        private void GetInputForNewPawnShop()
+        {
+            string pawnShopName = Game.GetUserInput("Pawn Shop Name", 25); // Get the name of the pawn shop
+            CreatePawnShop(Game.Player.Character.Position, pawnShopName); // Create the pawn shop
+            UI.Notify("Successfully created pawn shop!"); // Notify the user that the pawn shop was created
         }
 
         private void CreatePawnShop(Vector3 positionOfShop, string shopName)
@@ -248,6 +367,17 @@ Visit a ~g~Pawn Shop ~w~to sell your loot"; // Set the item to be the item retri
                 markerZ = positionOfShop.Z
             };
             modConfig.pawnShops.Add(shop); // Add the shop to the modconfig
+            Save(); // Save
+        }
+
+        private void CreatePawnItem(string displayName, int value)
+        {
+            LootItem item = new LootItem()
+            {
+                displayName = displayName,
+                value = value
+            };
+            modConfig.lootItems.Add(item); // Add the item to the modconfig
             Save(); // Save
         }
     }
