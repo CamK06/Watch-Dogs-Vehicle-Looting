@@ -13,7 +13,7 @@ namespace WDVH
 {
     public class Main : Script
     {
-        private Configuration modConfig; // The mod configuration
+        public Configuration modConfig; // The mod configuration
         private List<Vehicle> lootedVehicles = new List<Vehicle>(); // Create a list of vehicles that have been looted so they cannot be looted again
         private List<Blip> pawnBlips = new List<Blip>(); // Create a list of pawnshop blips to be deleted when the mod is unloaded
         private List<Vector3> pawnLocations = new List<Vector3>(); // Create a list of pawn shop locations to be used in getting if the player is near a shop
@@ -37,7 +37,7 @@ namespace WDVH
                     {
                         Game.FadeScreenOut(1000); // Fade the screen out
                         Game.Player.Character.FreezePosition = true; // Freeze the player to prevent them from walking as the screen is faded
-                        Wait(1000); // Wait 500ms
+                        Wait(1000); // Wait 1000ms
                         int itemCount = modConfig.inventory.items.Count; // Create a value for the amount of items sold
                         int itemValue = modConfig.inventory.totalValue; // Create a value for the total value of the items
                         modConfig.inventory.items.Clear(); // Clear the inventory
@@ -108,7 +108,8 @@ namespace WDVH
             {
                 if (!lootedVehicles.Contains(Game.Player.Character.CurrentVehicle)) // Check if the current vehicle is not already looted
                 {
-                    LootVehicle(Game.Player.Character.CurrentVehicle); // Loot the vehicle
+                    int randomNumber = new Random().Next(1, 100); // Create a random number to determine if the vehicle will even have loot to begin with
+                    if(randomNumber <= 75) LootVehicle(Game.Player.Character.CurrentVehicle); // if the random number is less than or equal to 75 then loot the vehicle
                 }
             }
             else
@@ -315,7 +316,7 @@ Visit a ~g~Pawn Shop ~w~to sell your loot"; // Set the item to be the item retri
             }
         }
 
-        private void Save()
+        public void Save()
         {
             string json = JsonConvert.SerializeObject(modConfig, Formatting.Indented); // Serialize the config
             if(json != null && json != "") File.WriteAllText("scripts\\WatchDogsVehLoot.json", json); // Write the config if the json is not blank
