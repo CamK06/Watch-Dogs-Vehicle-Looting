@@ -90,7 +90,7 @@ namespace WDVH
             // Cleanup
             foreach(Blip blp in pawnBlips)
             {
-                blp.Remove();
+                blp.Remove(); // Remove the blip
             }
         }
 
