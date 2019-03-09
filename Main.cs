@@ -134,33 +134,10 @@ namespace WDVH
             else // Else the value is below 50 so the player will get a random amount of cash
                 lootIsMoney = true;
             string item = null; // Blank string to be set as the item once one is determined
-        redraw:
             int number = r.Next(0, modConfig.lootItems.Count); // Generate a number using the Random from the amount of items in possibleLoot. This number determines what the loot is
+            LootItem loot = modConfig.lootItems[number]; // Uses the previously made random number to get an item from the enum
 
-
-            // This whole section of code is really useless, I have absolutely no idea how to actually get a random item based on probability, which is of course based on the value (START)
-
-            // Create two random loot items
-            LootItem loot1 = modConfig.lootItems[number];
-            LootItem loot2 = modConfig.lootItems[number];
-            // Create an integer for the probability of each item
-            int loot1Prob = 75;
-            int loot2Prob = 75;
-            int randomPercent = r.Next(1, 99); // Create a random number from 1 to 99 to determine which loot item is picked
-            // If loot1's value is greater than loot2's value set loot1's probability to be lower, and vice versa for loot2
-            if (loot1.value > loot2.value) loot1Prob = 25;
-            else if (loot2.value > loot1.value) loot2Prob = 25;
-
-            LootItem loot; // Create a new loot item variable
-
-            // Determine which of the two loot items is picked
-            if (loot1Prob >= randomPercent) loot = loot1;
-            else loot = loot2;
-
-            // END
-
-
-        returnpos:
+            returnpos:
             if (modConfig == null) { VerifyAndLoadJson(); goto returnpos; } // If the modconfig doesn't exist verify the json and check again
             Wait(1500);
 
