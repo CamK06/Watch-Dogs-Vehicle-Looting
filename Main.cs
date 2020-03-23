@@ -24,7 +24,7 @@ namespace WDVH
             Tick += OnTick; // Set up OnTick
             Aborted += OnAbort; // When the mod is closed
             KeyDown += OnKeyDown; // When a key is pressed
-            UI.Notify("Watch_Dogs Vehicle Loot by ~y~Derpy-Canadian ~w~loaded!"); // Sends a notification above the minimap telling the user that the mod has loaded
+            UI.Notify("Watch_Dogs Vehicle Looting by ~y~Derpy-Canadian ~w~loaded!"); // Sends a notification above the minimap telling the user that the mod has loaded
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e)
