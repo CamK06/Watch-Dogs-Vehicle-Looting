@@ -17,10 +17,12 @@ namespace WDVH
         private List<Vehicle> lootedVehicles = new List<Vehicle>(); // Create a list of vehicles that have been looted so they cannot be looted again
         private List<Blip> pawnBlips = new List<Blip>(); // Create a list of pawnshop blips to be deleted when the mod is unloaded
         private List<Vector3> pawnLocations = new List<Vector3>(); // Create a list of pawn shop locations to be used in getting if the player is near a shop
+        private List<Model> blockedModels = new List<Model>();
 
         public Main() // Runs when the script is loaded
         {
             VerifyAndLoadJson();
+            foreach (string modelName in modConfig.blockedVehicles) blockedModels.Add(new Model(modelName));
             Tick += OnTick; // Set up OnTick
             Aborted += OnAbort; // When the mod is closed
             KeyDown += OnKeyDown; // When a key is pressed
@@ -54,33 +56,36 @@ namespace WDVH
                 }
             }
 
-            if (e.KeyCode == modConfig.settings.addPawnKey) // If the player pressed the key to add a pawn shop
+            if (modConfig.settings.isAddPawnAndItemEnabled)
             {
-                if(modConfig.settings.doesAddPawnRequireShift) // If adding pawn shops requires shift
+                if (e.KeyCode == modConfig.settings.addPawnKey) // If the player pressed the key to add a pawn shop
                 {
-                    if (e.Shift) // If shift is pressed
+                    if (modConfig.settings.doesAddPawnRequireShift) // If adding pawn shops requires shift
+                    {
+                        if (e.Shift) // If shift is pressed
+                        {
+                            GetInputForNewPawnShop(); // Call the method used to get the information on the new shop and create it
+                        }
+                    }
+                    else // If it doesn't require shift
                     {
                         GetInputForNewPawnShop(); // Call the method used to get the information on the new shop and create it
                     }
                 }
-                else // If it doesn't require shift
-                {
-                    GetInputForNewPawnShop(); // Call the method used to get the information on the new shop and create it
-                }
-            }
 
-            if(e.KeyCode == modConfig.settings.addItemKey) // If the player pressed the ky to add an item
-            {
-                if (modConfig.settings.doesAddItemRequireShift) // If adding items requires shift
+                if (e.KeyCode == modConfig.settings.addItemKey) // If the player pressed the key to add an item
                 {
-                    if (e.Shift)
+                    if (modConfig.settings.doesAddItemRequireShift) // If adding items requires shift
+                    {
+                        if (e.Shift)
+                        {
+                            GetInputForNewPawnItem(); // Call the method used to get the information on the new item and create it
+                        }
+                    }
+                    else // If it doesn't require shift
                     {
                         GetInputForNewPawnItem(); // Call the method used to get the information on the new item and create it
                     }
-                }
-                else // If it doesn't require shift
-                {
-                    GetInputForNewPawnItem(); // Call the method used to get the information on the new item and create it
                 }
             }
         }
@@ -104,9 +109,9 @@ namespace WDVH
                 }
             }
 
-            if (Game.Player.Character.CurrentVehicle != null) // If the player is in a vehicle
+            if (Game.Player.Character.CurrentVehicle != null && Game.Player.Character.SeatIndex == VehicleSeat.Driver) // If the player is driving a vehicle
             {
-                if (!lootedVehicles.Contains(Game.Player.Character.CurrentVehicle)) // Check if the current vehicle is not already looted
+                if (!lootedVehicles.Contains(Game.Player.Character.CurrentVehicle) && !blockedModels.Contains(Game.Player.Character.CurrentVehicle.Model) && !Game.Player.Character.CurrentVehicle.HasSiren) // Check if the current vehicle is not already looted and if it's not blacklisted
                 {
                     int randomNumber = new Random().Next(1, 100); // Create a random number to determine if the vehicle will even have loot to begin with
                     if(randomNumber <= 75) LootVehicle(Game.Player.Character.CurrentVehicle); // if the random number is less than or equal to 75 then loot the vehicle
@@ -181,6 +186,7 @@ Visit a ~g~Pawn Shop ~w~to sell your loot"; // Set the item to be the item retri
                 modConfig.settings = new Settings();
                 modConfig.lootItems = new List<LootItem>(); // Create a list of loot
                 modConfig.pawnShops = new List<PawnShop>(); // Create a list of pawn shops
+                modConfig.blockedVehicles = new List<string>(); // Create a list of blocked vehicles
                 modConfig.inventory = new Inventory()
                 {
                     items = new List<LootItem>(),
@@ -239,13 +245,14 @@ Visit a ~g~Pawn Shop ~w~to sell your loot"; // Set the item to be the item retri
                 modConfig.settings.money = new Dictionary<string, int> // Set the min and max money possible to get
                 {
                     { "minMoney", 25 },
-                    { "maxMoney", 5000 }
+                    { "maxMoney", 2500 }
                 };
 
                 // Define the default keys for adding items and pawn shops
                 modConfig.settings.addItemKey = Keys.K;
                 modConfig.settings.addPawnKey = Keys.L;
                 // Make both adding pawn shops and items require shift
+                modConfig.settings.isAddPawnAndItemEnabled = false;
                 modConfig.settings.doesAddItemRequireShift = true;
                 modConfig.settings.doesAddPawnRequireShift = true;
 

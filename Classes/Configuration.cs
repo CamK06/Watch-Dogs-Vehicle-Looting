@@ -7,6 +7,7 @@ namespace WatchDogsVehLoot
         public Settings settings { get; set; } // Define the settings that will contain things like the min and max money amount, keybinds, etc
         public List<LootItem> lootItems { get; set; } // Define the list that will have the possible loot items
         public List<PawnShop> pawnShops { get; set; } // Define the list that will contain the pawn shops
+        public List<string> blockedVehicles { get; set; } // Define the list to contain blocked vehicle models
         public Inventory inventory { get; set; } // Define the inventory
     }
 }
