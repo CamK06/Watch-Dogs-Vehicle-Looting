@@ -43,7 +43,7 @@ namespace Watch_Dogs_Vehicle_Looting
             // If the player is driving a vehicle, try to loot it
             if(Game.Player.Character.IsInVehicle() && Game.Player.Character.SeatIndex == VehicleSeat.Driver)
             {
-                if (!lootedVehicles.Contains(Game.Player.Character.CurrentVehicle))
+                if (!lootedVehicles.Contains(Game.Player.Character.CurrentVehicle) && !Mod.blockedModels.Contains(Game.Player.Character.CurrentVehicle.Model))
                 {
                     Wait(2500);
                     if (new Random().Next(1, 100) <= 75) Mod.LootVehicle(Game.Player.Character.CurrentVehicle);

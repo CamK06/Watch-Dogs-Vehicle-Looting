@@ -31,6 +31,7 @@ namespace Watch_Dogs_Vehicle_Looting
 
         // Misc
         public static List<Blip> blips = new List<Blip>();
+        public static List<Model> blockedModels = new List<Model>();
 
         public static void VerifyFileStructure()
         {
@@ -55,6 +56,7 @@ namespace Watch_Dogs_Vehicle_Looting
             items = JsonConvert.DeserializeObject<List<Item>>(File.ReadAllText(pawnItemsJson));
             food = JsonConvert.DeserializeObject<List<Food>>(File.ReadAllText(foodItemsJson));
             weapons = JsonConvert.DeserializeObject<List<Classes.Items.Weapon>>(File.ReadAllText(weaponsJson));
+            foreach (string model in config.blockedVehicles) blockedModels.Add(new Model(model));
         }
 
         public static void CreateBlips()
@@ -107,7 +109,7 @@ namespace Watch_Dogs_Vehicle_Looting
             if(type == ItemType.pawnItem)
             {
                 Item item = items[r.Next(items.Count)];
-                itemName = item.name;
+                itemName = item.name + " ($" + item.value + ")";
                 inventory.pawnItems.Add(item);
                 inventory.totalValue += item.value;
                 InventoryManagement.SaveInventory(inventory);
