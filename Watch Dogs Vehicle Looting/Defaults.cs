@@ -12,8 +12,8 @@ namespace Watch_Dogs_Vehicle_Looting
         {
             new Item()
             {
-                name = "Playstadium 4",
-                value = 650
+                name = "Luxury Timepiece",
+                value = 150
             },
             new Item()
             {
@@ -28,7 +28,7 @@ namespace Watch_Dogs_Vehicle_Looting
             new Item()
             {
                 name = "Gold Ring",
-                value = 1000
+                value = 500
             },
             new Item()
             {
@@ -39,6 +39,46 @@ namespace Watch_Dogs_Vehicle_Looting
             {
                 name = "Krolex Watch",
                 value = 125
+            },
+            new Item()
+            {
+                name = "E-Reader",
+                value = 100
+            },
+            new Item()
+            {
+                name = "Silver Artisan Ring",
+                value = 75
+            },
+            new Item()
+            {
+                name = "Tablet",
+                value = 200
+            },
+            new Item()
+            {
+                name = "Smart Watch",
+                value = 300
+            },
+            new Item()
+            {
+                name = "Antique Coin",
+                value = 125
+            },
+            new Item()
+            {
+                name = "LifeInvader II Microcomputer",
+                value = 200
+            },
+            new Item()
+            {
+                name = "Fitness Wristband",
+                value = 50
+            },
+            new Item()
+            {
+                name = "Smartphone",
+                value = 250
             }
         };
 
@@ -64,6 +104,21 @@ namespace Watch_Dogs_Vehicle_Looting
             {
                 name = "Moldy Hamburger",
                 healsPlayer = false
+            },
+            new Food()
+            {
+                name = "Bleeder Burger",
+                healsPlayer = true
+            },
+            new Food()
+            {
+                name = "Sandwich",
+                healsPlayer = true
+            },
+            new Food()
+            {
+                name = "Moldy Food Scraps",
+                healsPlayer = false
             }
         };
 
@@ -74,11 +129,6 @@ namespace Watch_Dogs_Vehicle_Looting
             {
                 weaponName = "Pistol",
                 weaponHash = WeaponHash.Pistol
-            },
-            new Weapon()
-            {
-                weaponName = "Grenade",
-                weaponHash = WeaponHash.Grenade
             },
             new Weapon()
             {

@@ -29,7 +29,7 @@ namespace Watch_Dogs_Vehicle_Looting
             Aborted += Mod.OnAbort;
             KeyDown += OnKeyDown;
 
-            UI.Notify("Watch Dogs Vehicle Looting successfully loaded!");
+            UI.Notify("~y~Watch Dogs Vehicle Looting ~w~successfully loaded!");
         }
 
         private void OnTick(object sender, EventArgs e)

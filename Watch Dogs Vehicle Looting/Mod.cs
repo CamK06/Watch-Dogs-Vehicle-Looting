@@ -121,6 +121,11 @@ namespace Watch_Dogs_Vehicle_Looting
             else if(type == ItemType.weapon)
             {
                 Classes.Items.Weapon weapon = weapons[r.Next(weapons.Count)];
+                if (Game.Player.Character.Weapons.HasWeapon(weapon.weaponHash))
+                {
+                    LootVehicle(veh);
+                    return;
+                }
                 itemName = weapon.weaponName;
                 Weapon(weapon.weaponHash);
             }
