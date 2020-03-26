@@ -38,7 +38,6 @@ namespace Watch_Dogs_Vehicle_Looting
             if(Mod.config.settings.pawnShop3dMarkers)
                 foreach(PawnShop shop in Mod.config.pawnShops)
                     if (World.GetDistance(Game.Player.Character.Position, new Vector3(shop.markerX, shop.markerY, shop.markerZ)) <= 150) World.DrawMarker(MarkerType.VerticalCylinder, new Vector3(shop.markerX, shop.markerY, shop.markerZ - shop.markerZ / shop.markerZ), Vector3.Zero, Vector3.Zero, new Vector3(1.5f, 1.5f, 0.5f), Color.Yellow);
-                    
 
 
             // If the player is driving a vehicle, try to loot it
@@ -46,6 +45,7 @@ namespace Watch_Dogs_Vehicle_Looting
             {
                 if (!lootedVehicles.Contains(Game.Player.Character.CurrentVehicle))
                 {
+                    Wait(2500);
                     if (new Random().Next(1, 100) <= 75) Mod.LootVehicle(Game.Player.Character.CurrentVehicle);
                     lootedVehicles.Add(Game.Player.Character.CurrentVehicle);
                 }

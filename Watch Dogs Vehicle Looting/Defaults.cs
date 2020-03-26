@@ -117,6 +117,13 @@ namespace Watch_Dogs_Vehicle_Looting
                 markerX = 412.780243f,
                 markerY = 313.337982f,
                 markerZ = 103.020088f
+            },
+            new PawnShop()
+            {
+                displayName = "Senora Fwy Discount Jewels",
+                markerX = 2661.764f,
+                markerY = 3466.93921f,
+                markerZ = 55.80189f
             }
         };
     }
