@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using GTA;
 using GTA.Math;
+using GTA.Native;
 using Newtonsoft.Json;
 using Watch_Dogs_Vehicle_Looting.Classes;
 using Watch_Dogs_Vehicle_Looting.Classes.Items;
@@ -19,7 +20,6 @@ namespace Watch_Dogs_Vehicle_Looting
 
         // Directories
         public static string resourceDir = "scripts\\Watch Dogs Vehicle Looting";
-        public static string inventoryDir = $"{resourceDir}\\Inventories";
         public static string itemDir = $"{resourceDir}\\Items";
 
         // Files
@@ -27,6 +27,7 @@ namespace Watch_Dogs_Vehicle_Looting
         public static string foodItemsJson = $"{itemDir}\\foodItems.json";
         public static string weaponsJson = $"{itemDir}\\weapons.json";
         public static string modConfig = $"{resourceDir}\\modConfig.json";
+        public static string inventories = $"{resourceDir}\\inventories.json";
 
         // Misc
         public static List<Blip> blips = new List<Blip>();
@@ -35,7 +36,6 @@ namespace Watch_Dogs_Vehicle_Looting
         {
             // Ensure that all necessary directories and files exist
             if (!Directory.Exists(resourceDir)) Directory.CreateDirectory(resourceDir);
-            if (!Directory.Exists(inventoryDir)) Directory.CreateDirectory(inventoryDir);
             if (!Directory.Exists(itemDir)) Directory.CreateDirectory(itemDir);
 
             // Items
@@ -43,8 +43,9 @@ namespace Watch_Dogs_Vehicle_Looting
             if (!File.Exists(foodItemsJson)) File.WriteAllText(foodItemsJson, JsonConvert.SerializeObject(Defaults.defaultFood, Formatting.Indented));
             if (!File.Exists(weaponsJson)) File.WriteAllText(weaponsJson, JsonConvert.SerializeObject(Defaults.defaultWeapons, Formatting.Indented));
 
-            // Configuration
+            // Configuration & Inventory
             if (!File.Exists(modConfig)) File.WriteAllText(modConfig, JsonConvert.SerializeObject(new Configuration() { pawnShops = Defaults.defaultShops, blockedVehicles = new List<string>(), settings = new Settings() }, Formatting.Indented));
+            if(!File.Exists(inventories)) File.WriteAllText(inventories, JsonConvert.SerializeObject(new List<Inventory>(), Formatting.Indented));
         }
 
         public static void LoadConfig()
@@ -95,10 +96,75 @@ namespace Watch_Dogs_Vehicle_Looting
             File.WriteAllText(modConfig, JsonConvert.SerializeObject(config, Formatting.Indented));
         }
 
+        public static void LootVehicle(Vehicle veh)
+        {
+            Random r = new Random();
+            Inventory inventory = InventoryManagement.GetInventory((PedHash)Game.Player.Character.Model.GetHashCode());
+
+            // Determine the loot item
+            string itemName = "";
+            ItemType type = RandomEnumValue<ItemType>();
+            if(type == ItemType.pawnItem)
+            {
+                Item item = items[r.Next(items.Count)];
+                itemName = item.name;
+                inventory.pawnItems.Add(item);
+                inventory.totalValue += item.value;
+                InventoryManagement.SaveInventory(inventory);
+            }
+            else if(type == ItemType.food)
+            {
+                Food foodItem = food[r.Next(food.Count)];
+                itemName = foodItem.name;
+                if (foodItem.healsPlayer) Game.Player.Character.Health = Game.Player.Character.MaxHealth;
+            }
+            else if(type == ItemType.weapon)
+            {
+                Classes.Items.Weapon weapon = weapons[r.Next(weapons.Count)];
+                itemName = weapon.weaponName;
+                Weapon(weapon.weaponHash);
+            }
+            else if(type == ItemType.money)
+            {
+                int amount = r.Next(config.settings.money.minMoney, config.settings.money.maxMoney);
+                itemName = $"${amount}";
+                Game.Player.Money += amount;
+            }
+
+            UI.Notify($"Vehicle Looted: {itemName}");
+        }
+
+        private static void Weapon(WeaponHash Weapon)
+        {
+            // If the player does not have the weapon, give one to them
+            if (!Game.Player.Character.Weapons.HasWeapon(Weapon))
+            {
+                Game.Player.Character.Weapons.Give(Weapon, 0, true, true);
+            }
+
+            // Then, select the weapon and give 2 magazines
+            Game.Player.Character.Weapons.Select(Weapon);
+            Game.Player.Character.Weapons.Current.Ammo += (Game.Player.Character.Weapons.Current.MaxAmmoInClip * 2);
+        }
+
+        static T RandomEnumValue<T>()
+        {
+            var v = Enum.GetValues(typeof(T));
+            return (T)v.GetValue(new Random().Next(v.Length));
+        }
+
         internal static void OnAbort(object sender, EventArgs e)
         {
             // Iterate over and remove each blip
             foreach (Blip blip in blips) blip.Remove();
         }
+    }
+
+    enum ItemType
+    {
+        pawnItem,
+        weapon,
+        food,
+        money
     }
 }

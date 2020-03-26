@@ -39,6 +39,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -48,11 +49,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\Inventory.cs" />
     <Compile Include="Classes\Items\Food.cs" />
     <Compile Include="Classes\Items\Item.cs" />
     <Compile Include="Classes\Items\Weapon.cs" />
     <Compile Include="Classes\PawnShop.cs" />
     <Compile Include="Defaults.cs" />
+    <Compile Include="InventoryManagement.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Classes\Configuration.cs" />
     <Compile Include="Mod.cs" />
