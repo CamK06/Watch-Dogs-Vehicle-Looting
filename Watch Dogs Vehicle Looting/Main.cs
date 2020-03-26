@@ -78,7 +78,6 @@ namespace Watch_Dogs_Vehicle_Looting
                     Inventory inventory = InventoryManagement.GetInventory((PedHash)Game.Player.Character.Model.GetHashCode());
                     if (World.GetDistance(Game.Player.Character.Position, markerPos) <= 1.25f && inventory.pawnItems.Count >= 1)
                     {
-                        UI.Notify("SELL!");
                         // Sell every item
                         Game.FadeScreenOut(1000);
                         Game.Player.Character.FreezePosition = true;
